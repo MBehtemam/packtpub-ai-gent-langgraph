@@ -114,20 +114,41 @@ def planet_mass(name):
     }
     return f"{name} has a mass of {masses[name]} × 10^24 kg"
 
-known_actions = { "calculate": calculate, "planet_mass": planet_mass}
 
-#Create the agent
+known_actions = {"calculate": calculate, "planet_mass": planet_mass}
+
+# Create the agent
 agent = Agent(system=prompt)
 
-response = agent("What is the mass of Earth?")
+# response = agent("What is the mass of Earth?")
+# print(response)
+
+# response = planet_mass("Earth")
+# print(response)
+
+# next_response = f"Observation: {response}"
+# print(next_response)
+# response = agent(next_response)
+# print(response)
+
+# print(f"Agent Messages ---> {agent.messages}")
+
+# ----- Complex query ---
+# Complex Query
+question = "What is the combined mass of Earth and Mars?"
+response = agent(question)
 print(response)
 
-response = planet_mass("Earth")
-print(response)
+next_prompt = "Observation: {}".format(planet_mass("Earth"))
+print(next_prompt)
 
-next_response = f"Observation: {response}"
-print(next_response)
-response = agent(next_response)
+response = agent(next_prompt)
 print(response)
-
-print(f"Agent Messages ---> {agent.messages}")
+next_prompt = "Observation: {}".format(planet_mass("Mars"))
+response = agent(next_prompt)
+print(response)
+next_prompt = "Observation: the combined mass is {}".format(
+    calculate("5.972 + 0.64171")
+)
+response = agent(next_prompt)
+print(f"Final answer is {response}")
