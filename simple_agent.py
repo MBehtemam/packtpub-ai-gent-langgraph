@@ -2,6 +2,7 @@ import os
 from dotenv import load_dotenv
 from openai import OpenAI
 
+
 # Load environment variables from .env file
 load_dotenv()
 
@@ -135,23 +136,53 @@ agent = Agent(system=prompt)
 
 # ----- Complex query ---
 # Complex Query
-question = "What is the combined mass of Earth and Mars and Saturn?"
-response = agent(question)
-print(response)
+# question = "What is the combined mass of Earth and Mars and Saturn?"
+# response = agent(question)
+# print(response)
 
-next_prompt = "Observation: {}".format(planet_mass("Earth"))
-print(next_prompt)
+# next_prompt = "Observation: {}".format(planet_mass("Earth"))
+# print(next_prompt)
 
-response = agent(next_prompt)
-print(response)
-next_prompt = "Observation: {}".format(planet_mass("Mars"))
-response = agent(next_prompt)
-print(response)
-next_prompt = "Observation: {}".format(planet_mass("Saturn"))
-response = agent(next_prompt)
-print(response)
-next_prompt = "Observation: the combined mass is {}".format(
-    calculate("5.972 + 0.64171 + 568.34")
-)
-response = agent(next_prompt)
-print(f"Final answer is {response}")
+# response = agent(next_prompt)
+# print(response)
+# next_prompt = "Observation: {}".format(planet_mass("Mars"))
+# response = agent(next_prompt)
+# print(response)
+# next_prompt = "Observation: {}".format(planet_mass("Saturn"))
+# response = agent(next_prompt)
+# print(response)
+# next_prompt = "Observation: the combined mass is {}".format(
+#     calculate("5.972 + 0.64171 + 568.34")
+# )
+# response = agent(next_prompt)
+# print(f"Final answer is {response}")
+
+# Final Solution ---- Automate agent ----
+import re
+action_re = re.compile(r"^Action: (\w+): (.*)$")
+
+#Create a query function
+def query(question, max_turns=5):
+    i = 0
+    bot = Agent(prompt)
+    next_prompt = question
+    while i < max_turns:
+        i += 1
+        result = bot(next_prompt)
+        print(result)
+        actions = [action_re.match(a) for a in result.split("\n") if action_re.match(a)]
+        if actions:
+            # There is an action to run
+            action, action_input = actions[0].groups()
+            if action not in known_actions:
+                raise Exception("Unknown action: {}: {}".format(action, action_input))
+            print(" -- running {} {}".format(action, action_input))
+            observation = known_actions[action](action_input)
+            next_prompt = "Observation: {}".format(observation)
+            print(next_prompt)
+        else:
+            return
+        
+# New Scenario: Calculating combined mass of Earth and Jupiter
+question = "What is the combined mass of Earth and Jupiter?"
+query(question)
