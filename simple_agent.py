@@ -135,7 +135,7 @@ agent = Agent(system=prompt)
 
 # ----- Complex query ---
 # Complex Query
-question = "What is the combined mass of Earth and Mars?"
+question = "What is the combined mass of Earth and Mars and Saturn?"
 response = agent(question)
 print(response)
 
@@ -147,8 +147,11 @@ print(response)
 next_prompt = "Observation: {}".format(planet_mass("Mars"))
 response = agent(next_prompt)
 print(response)
+next_prompt = "Observation: {}".format(planet_mass("Saturn"))
+response = agent(next_prompt)
+print(response)
 next_prompt = "Observation: the combined mass is {}".format(
-    calculate("5.972 + 0.64171")
+    calculate("5.972 + 0.64171 + 568.34")
 )
 response = agent(next_prompt)
 print(f"Final answer is {response}")
