@@ -90,7 +90,7 @@ graph_builder.add_conditional_edges("bot", tools_condition)
 graph_builder.set_entry_point("bot")
 # graph_builder.set_finish_point("bot")
 
-graph = graph_builder.compile(checkpointer=memory)
+graph = graph_builder.compile(checkpointer=memory, interrupt_before=["tools"])
 
 config = {
     "configurable": { "thread_id": 1}
