@@ -8,6 +8,7 @@ from langchain_tavily import TavilySearch
 import json
 from langchain_core.messages import ToolMessage, BaseMessage
 from langgraph.prebuilt import ToolNode, tools_condition
+from langgraph.checkpoint.memory import MemorySaver
 
 load_dotenv()
 openai_key = os.getenv("OPENAI_API_KEY")
@@ -20,7 +21,7 @@ model = ChatOpenAI(api_key=openai_key, model=llm_name)
 class State(TypedDict):
     messages: Annotated[list, add_messages]
 
-
+memory = MemorySaver()
 graph_builder = StateGraph(State)
 
 # Create tools
@@ -89,8 +90,19 @@ graph_builder.add_conditional_edges("bot", tools_condition)
 graph_builder.set_entry_point("bot")
 # graph_builder.set_finish_point("bot")
 
-graph = graph_builder.compile()
+graph = graph_builder.compile(checkpointer=memory)
 
+config = {
+    "configurable": { "thread_id": 1}
+}
+
+user_input = "Hi there! My name is Mohammad."
+
+events = graph.stream(
+    { "messages": [("user", user_input)]}, config, stream_mode="values"
+)
+for event in events:
+    event["messages"][-1].pretty_print()
 while True:
     user_input = input("User: ")
     if user_input.lower() in ["quit", "exit", "q"]:
